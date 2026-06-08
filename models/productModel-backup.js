@@ -35,24 +35,6 @@ exports.getAllProducts = (callback) => {
         callback
     );
 };
-exports.searchProducts = (search, category, callback) => {
-  let sql = 'SELECT * FROM products WHERE 1=1';
-  const params = [];
-
-  if (search && search.trim() !== '') {
-    sql += ' AND name LIKE ?';
-    params.push('%' + search.trim() + '%');
-  }
-
-  if (category && category.trim() !== '') {
-    sql += ' AND category = ?';
-    params.push(category.trim());
-  }
-
-  sql += ' ORDER BY name ASC';
-
-  db.query(sql, params, callback);
-};
 
 // READ ONE
 exports.getProductById = (

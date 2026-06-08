@@ -5,10 +5,16 @@ const productController =
     require("../controllers/productController");
 
 // LIST PRODUCTS
+const {
+    requireAuth
+} = require("../middleware/auth");
+
 router.get(
     "/",
+    requireAuth,
     productController.listProducts
 );
+
 
 // ADD PRODUCT FORM
 router.get(
