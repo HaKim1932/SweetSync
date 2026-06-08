@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Orders</title>
+</head>
+<body>
+
+<h1>All Orders</h1>
+
+<% orders.forEach(order => { %>
+
+    <h3>
+        Order #<%= order.id %>
+    </h3>
+
+    <p>
+        Customer:
+        <%= order.fullname %>
+    </p>
+
+    <p>
+        Total:
+        ₱<%= order.total %>
+    </p>
+
+   <p>
+    Status:
+    <%= order.status %>
+</p>
+
+<form
+    action="/admin/orders/<%= order.id %>/status"
+    method="POST"
+>
+
+<select name="status">
+
+<option value="Pending">
+    Pending
+</option>
+
+<option value="Processing">
+    Processing
+</option>
+
+<option value="Completed">
+    Completed
+</option>
+
+<option value="Cancelled">
+    Cancelled
+</option>
+
+</select>
+
+<button type="submit">
+    Update
+</button>
+
+</form>
+
+    <hr>
+
+<% }) %>
+
+</body>
+</html>

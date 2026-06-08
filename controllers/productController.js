@@ -1,0 +1,115 @@
+const Product = require("../models/productModel");
+
+// LIST PRODUCTS
+exports.listProducts = (req, res) => {
+    Product.getAllProducts((err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        res.render("products/list-products", {
+            products: results
+        });
+    });
+};
+
+// SHOW ADD FORM
+exports.showAddProduct = (req, res) => {
+    res.render("products/add-product");
+};
+
+// ADD PRODUCT
+exports.addProduct = (req, res) => {
+    const {
+        name,
+        description,
+        price,
+        stock,
+        category
+    } = req.body;
+
+    Product.createProduct(
+        name,
+        description,
+        price,
+        stock,
+        category,
+        (err) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.redirect("/products");
+        }
+    );
+};
+
+// SHOW EDIT FORM
+exports.showEditProduct = (req, res) => {
+    const id = req.params.id;
+
+    Product.getProductById(
+        id,
+        (err, results) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            if (results.length === 0) {
+                return res.send("Product not found");
+            }
+
+            res.render(
+                "products/edit-product",
+                {
+                    product: results[0]
+                }
+            );
+        }
+    );
+};
+
+// UPDATE PRODUCT
+exports.updateProduct = (req, res) => {
+    const id = req.params.id;
+
+    const {
+        name,
+        description,
+        price,
+        stock,
+        category
+    } = req.body;
+
+    Product.updateProduct(
+        id,
+        name,
+        description,
+        price,
+        stock,
+        category,
+        (err) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.redirect("/products");
+        }
+    );
+};
+
+// DELETE PRODUCT
+exports.deleteProduct = (req, res) => {
+    const id = req.params.id;
+
+    Product.deleteProduct(
+        id,
+        (err) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.redirect("/products");
+        }
+    );
+};

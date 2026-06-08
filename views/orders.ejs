@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orders</title>
+</head>
+<body>
+
+<h1>My Orders</h1>
+
+<% if(orders.length === 0) { %>
+
+<p>No orders yet</p>
+
+<% } else { %>
+
+    <% orders.forEach(order => { %>
+
+        <h3>
+            Order #<%= order.id %>
+        </h3>
+
+        <p>
+            Total:
+            ₱<%= order.total %>
+        </p>
+
+        <p>
+            Status:
+            <%= order.status %>
+        </p>
+
+        <hr>
+
+    <% }) %>
+
+<% } %>
+
+<a href="/products">
+    Back to Products
+</a>
+
+</body>
+</html>
