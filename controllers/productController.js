@@ -2,15 +2,42 @@ const Product = require("../models/productModel");
 
 // LIST PRODUCTS
 exports.listProducts = (req, res) => {
-    Product.getAllProducts((err, results) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+  const search = req.query.search || '';
+  const category = req.query.category || '';
 
-        res.render("products/list-products", {
-            products: results
-        });
+  // Get distinct categories for the filter buttons
+  Product.getAllProducts((err, allProducts) => {
+    if (err) {
+      console.error('listProducts - getAllProducts error:', err);
+      return res.status(500).send(err);
+    }
+
+    // Extract unique categories from all products
+    const categories = [];
+    allProducts.forEach((product) => {
+      if (
+        product.category &&
+        categories.indexOf(product.category) === -1
+      ) {
+        categories.push(product.category);
+      }
     });
+
+    // Now run search/filter query
+    Product.searchProducts(search, category, (err, results) => {
+      if (err) {
+        console.error('listProducts - searchProducts error:', err);
+        return res.status(500).send(err);
+      }
+
+      res.render('products/list-products', {
+        products: results,
+        categories: categories,
+        currentSearch: search,
+        currentCategory: category
+      });
+    });
+  });
 };
 
 // SHOW ADD FORM
