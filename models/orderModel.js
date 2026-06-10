@@ -1,21 +1,13 @@
 const db = require("../config/db");
 
-exports.createOrder = (
-    userId,
-    total,
-    callback
-) => {
+exports.createOrder = (userId, total, callback) => {
     const sql = `
         INSERT INTO orders
         (user_id, total)
         VALUES (?, ?)
     `;
 
-    db.query(
-        sql,
-        [userId, total],
-        callback
-    );
+    db.query(sql, [userId, total], callback);
 };
 
 exports.addOrderItem = (
@@ -33,29 +25,55 @@ exports.addOrderItem = (
 
     db.query(
         sql,
-        [
-            orderId,
-            productId,
-            quantity,
-            price
-        ],
+        [orderId, productId, quantity, price],
         callback
     );
 };
 
-exports.getOrdersByUser = (
-    userId,
-    callback
-) => {
+exports.getOrderCountByUser = (userId, callback) => {
+    const sql = `
+        SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending,
+            SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) AS completed
+        FROM orders
+        WHERE user_id = ?
+    `;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0]);
+    });
+};
+
+exports.getRecentOrdersByUser = (userId, callback) => {
+    const sql = `
+        SELECT
+            id,
+            total,
+            status,
+            created_at
+        FROM orders
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 5
+    `;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) return callback(err);
+        callback(null, results);
+    });
+};
+
+exports.getOrdersByUser = (userId, callback) => {
     db.query(
         "SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC",
         [userId],
         callback
     );
 };
-exports.getAllOrders = (
-    callback
-) => {
+
+exports.getAllOrders = (callback) => {
     const sql = `
         SELECT
             orders.*,
@@ -66,41 +84,29 @@ exports.getAllOrders = (
         ORDER BY orders.id DESC
     `;
 
-    db.query(
-        sql,
-        callback
-    );
+    db.query(sql, callback);
 };
-exports.updateStatus = (
-    orderId,
-    status,
-    callback
-) => {
+
+exports.updateStatus = (orderId, status, callback) => {
     db.query(
         "UPDATE orders SET status = ? WHERE id = ?",
         [status, orderId],
         callback
     );
 };
-exports.countOrders = (
-    callback
-) => {
+
+exports.countOrders = (callback) => {
     db.query(
         "SELECT COUNT(*) AS total FROM orders",
         callback
     );
 };
 
-exports.totalRevenue = (
-    callback
-) => {
+exports.totalRevenue = (callback) => {
     db.query(
         `
         SELECT
-        IFNULL(
-            SUM(total),
-            0
-        ) AS revenue
+            IFNULL(SUM(total), 0) AS revenue
         FROM orders
         `,
         callback
