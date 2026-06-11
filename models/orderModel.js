@@ -112,3 +112,23 @@ exports.totalRevenue = (callback) => {
         callback
     );
 };
+exports.getOrderItems = (
+    orderId,
+    callback
+) => {
+    const sql = `
+        SELECT
+            order_items.*,
+            products.name
+        FROM order_items
+        JOIN products
+        ON order_items.product_id = products.id
+        WHERE order_items.order_id = ?
+    `;
+
+    db.query(
+        sql,
+        [orderId],
+        callback
+    );
+};

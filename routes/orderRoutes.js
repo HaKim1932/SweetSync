@@ -8,16 +8,25 @@ const {
     requireAuth
 } = require("../middleware/auth");
 
+// ORDER HISTORY
 router.get(
     "/",
     requireAuth,
     orderController.orderHistory
 );
 
+// CHECKOUT
 router.get(
     "/checkout",
     requireAuth,
     orderController.checkout
+);
+
+// ORDER DETAILS
+router.get(
+    "/:id",
+    requireAuth,
+    orderController.orderDetails
 );
 
 module.exports = router;

@@ -140,3 +140,29 @@ exports.updateStatus = (
         }
     );
 };
+
+// ORDER DETAILS
+exports.orderDetails = (
+    req,
+    res
+) => {
+    const orderId =
+        req.params.id;
+
+    Order.getOrderItems(
+        orderId,
+        (err, items) => {
+            if (err) {
+                return res.send(err);
+            }
+
+            res.render(
+                "order-details",
+                {
+                    orderId,
+                    items
+                }
+            );
+        }
+    );
+};
