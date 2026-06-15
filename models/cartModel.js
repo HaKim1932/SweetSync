@@ -47,26 +47,23 @@ exports.addToCart = (
 };
 
 // GET CART ITEMS
-exports.getCartItems = (
-cartId,
-callback
-) => {
-db.query(
-`         SELECT
-            cart_items.id,
-            cart_items.product_id,
-            products.name,
-            products.price,
-            cart_items.quantity
-        FROM cart_items
-        JOIN products
-            ON products.id =
-               cart_items.product_id
-        WHERE cart_items.cart_id = ?
-        `,
-[cartId],
-callback
-);
+exports.getCartItems = (cartId, callback) => {
+  db.query(
+    `
+    SELECT
+      cart_items.id,
+      cart_items.product_id,
+      cart_items.quantity,
+      products.name,
+      products.price
+    FROM cart_items
+    JOIN products
+      ON products.id = cart_items.product_id
+    WHERE cart_items.cart_id = ?
+    `,
+    [cartId],
+    callback
+  );
 };
 
 exports.clearCart = (

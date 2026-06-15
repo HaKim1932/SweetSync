@@ -1,84 +1,141 @@
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
 
 // CHECKOUT
 exports.checkout = (req, res) => {
-    const userId = req.session.user.id;
+const userId = req.session.user.id;
 
-    Cart.getUserCart(
-        userId,
-        (err, carts) => {
-            if (err) {
-                return res.send(err);
-            }
+Cart.getUserCart(userId, (err, carts) => {
+    if (err) {
+        return res.send(err);
+    }
 
-            if (carts.length === 0) {
-                return res.send(
-                    "Cart not found"
-                );
-            }
+    if (carts.length === 0) {
+        return res.send("Cart not found");
+    }
 
-            const cartId = carts[0].id;
+    const cartId = carts[0].id;
 
-            Cart.getCartItems(
-                cartId,
-                (err, items) => {
+    Cart.getCartItems(cartId, (err, items) => {
+        if (err) {
+            return res.send(err);
+        }
+
+        // STOCK VALIDATION
+        let checkCount = 0;
+
+        items.forEach((item) => {
+            Product.getProductById(
+                item.product_id,
+                (err, results) => {
                     if (err) {
                         return res.send(err);
                     }
 
-                    let total = 0;
+                    const product = results[0];
 
-                    items.forEach(item => {
-                        total +=
-                            item.price *
-                            item.quantity;
-                    });
+                    if (!product) {
+                        return res.send(
+                            "Product not found"
+                        );
+                    }
 
-                    Order.createOrder(
-                        userId,
-                        total,
-                        (err, result) => {
-                            if (err) {
-                                return res.send(err);
-                            }
+                    if (
+                        product.stock <
+                        item.quantity
+                    ) {
+                        return res.send(
+                            `${product.name} is out of stock. Available: ${product.stock}`
+                        );
+                    }
 
-                            const orderId =
-                                result.insertId;
+                    checkCount++;
 
-                            let completed = 0;
+                    if (
+                        checkCount ===
+                        items.length
+                    ) {
+                        proceedCheckout(
+                            items,
+                            cartId
+                        );
+                    }
+                }
+            );
+        });
 
-                            items.forEach(item => {
-                                Order.addOrderItem(
-                                    orderId,
+        function proceedCheckout(
+            items,
+            cartId
+        ) {
+            let total = 0;
+
+            items.forEach((item) => {
+                total +=
+                    item.price *
+                    item.quantity;
+            });
+
+            Order.createOrder(
+                userId,
+                total,
+                (err, result) => {
+                    if (err) {
+                        return res.send(err);
+                    }
+
+                    const orderId =
+                        result.insertId;
+
+                    let completed = 0;
+
+                    items.forEach((item) => {
+                        Order.addOrderItem(
+                            orderId,
+                            item.product_id,
+                            item.quantity,
+                            item.price,
+                            (err) => {
+                                if (err) {
+                                    return res.send(err);
+                                }
+
+                                Product.deductStock(
                                     item.product_id,
                                     item.quantity,
-                                    item.price,
-                                    () => {
+                                    (err) => {
+                                        if (err) {
+                                            return res.send(err);
+                                        }
+
                                         completed++;
 
-                                       if (
-    completed ===
-    items.length
-) {
-    Cart.clearCart(
-        cartId,
-        () => {
-            res.redirect(
-                "/orders"
-            );
-        }
-    );
-}
+                                        if (
+                                            completed ===
+                                            items.length
+                                        ) {
+                                            Cart.clearCart(
+                                                cartId,
+                                                () => {
+                                                    res.redirect(
+                                                        "/orders"
+                                                    );
+                                                }
+                                            );
+                                        }
                                     }
                                 );
-                            });
-                        }
-                    );
+                            }
+                        );
+                    });
                 }
             );
         }
-    );
+    });
+});
+
+
 };
 
 // ORDER HISTORY

@@ -120,3 +120,34 @@ exports.countProducts = (
         callback
     );
 };
+exports.deductStock = (
+    productId,
+    quantity,
+    callback
+) => {
+    const sql = `
+        UPDATE products
+        SET stock = stock - ?
+        WHERE id = ?
+        AND stock >= ?
+    `;
+
+    db.query(
+        sql,
+        [
+            quantity,
+            productId,
+            quantity
+        ],
+        (err, result) => {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(
+                null,
+                result
+            );
+        }
+    );
+};
