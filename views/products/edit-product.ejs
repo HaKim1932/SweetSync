@@ -63,9 +63,11 @@
         <div class="form-card card">
           <div class="card-body p-4">
 
+
             <form
               action="/products/edit/<%= product.id %>"
               method="POST"
+              enctype="multipart/form-data"
             >
 
               <!-- Product Name -->
@@ -137,6 +139,33 @@
                   required
                 />
               </div>
+              <!-- Product Image -->
+<div class="mb-4">
+  <label class="form-label fw-semibold">
+    <i class="bi bi-image me-1 text-pink"></i>Product Image
+  </label>
+
+  <% if (product.image) { %>
+    <div class="mb-2">
+      <img
+        src="/<%= product.image %>"
+        alt="<%= product.name %>"
+        style="max-width: 160px; height: 120px; object-fit: cover; border-radius: 10px;"
+      />
+    </div>
+  <% } %>
+
+  <input
+    type="file"
+    name="image"
+    class="form-control"
+    accept="image/*"
+  />
+
+  <small class="text-muted">
+    Leave blank to keep current image.
+  </small>
+</div>
 
               <!-- Submit -->
               <div class="d-flex gap-2">

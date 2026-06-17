@@ -116,42 +116,69 @@ db.query(
 };
 
 // UPDATE
+// UPDATE
 exports.updateProduct = (
-id,
-name,
-description,
-price,
-stock,
-category,
-callback
-) => {
-
-
-const sql = `
-    UPDATE products
-    SET
-        name = ?,
-        description = ?,
-        price = ?,
-        stock = ?,
-        category = ?
-    WHERE id = ?
-`;
-
-db.query(
-    sql,
-    [
-        name,
-        description,
-        price,
-        stock,
-        category,
-        id
-    ],
+    id,
+    name,
+    description,
+    price,
+    stock,
+    category,
+    image,
     callback
-);
+) => {
+    let sql;
+    let params;
 
+    if (image) {
+        sql = `
+            UPDATE products
+            SET
+                name = ?,
+                description = ?,
+                price = ?,
+                stock = ?,
+                category = ?,
+                image = ?
+            WHERE id = ?
+        `;
 
+        params = [
+            name,
+            description,
+            price,
+            stock,
+            category,
+            image,
+            id
+        ];
+    } else {
+        sql = `
+            UPDATE products
+            SET
+                name = ?,
+                description = ?,
+                price = ?,
+                stock = ?,
+                category = ?
+            WHERE id = ?
+        `;
+
+        params = [
+            name,
+            description,
+            price,
+            stock,
+            category,
+            id
+        ];
+    }
+
+    db.query(
+        sql,
+        params,
+        callback
+    );
 };
 
 // DELETE

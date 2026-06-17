@@ -39,8 +39,9 @@ productController.showEditProduct
 
 // UPDATE PRODUCT
 router.post(
-"/edit/:id",
-productController.updateProduct
+    "/edit/:id",
+    upload.single("image"),
+    productController.updateProduct
 );
 
 // DELETE PRODUCT

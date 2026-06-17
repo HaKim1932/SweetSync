@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>My Reservations — SweetSync</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    body {
+      background-color: #fff8f9;
+    }
+
+    .text-pink {
+      color: #e91e8c;
+    }
+
+    .btn-pink {
+      background-color: #e91e8c;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-pink:hover {
+      background-color: #c4177a;
+      color: #fff;
+    }
+
+    .reservation-card {
+      border: none;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-reservation-card {
+      border: none;
+      border-radius: 12px;
+      background-color: #fff;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<%- include('../partials/navbar') %>
+
+<div class="container py-5">
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold text-pink mb-1">
+        <i class="bi bi-calendar-check me-2"></i>My Reservations
+      </h2>
+      <p class="text-muted mb-0">
+        Track your custom cake reservation requests.
+      </p>
+    </div>
+
+    <a href="/reservations/new" class="btn btn-pink btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>New Reservation
+    </a>
+  </div>
+
+  <% if (reservations.length === 0) { %>
+
+    <div class="reservation-card card">
+      <div class="card-body text-center py-5">
+        <i
+          class="bi bi-calendar-x"
+          style="font-size: 4rem; color: #dee2e6;"
+        ></i>
+
+        <h4 class="mt-3 text-muted">
+          No reservations yet
+        </h4>
+
+        <p class="text-muted">
+          Reserve a custom cake for your next celebration.
+        </p>
+
+        <a href="/reservations/new" class="btn btn-pink">
+          Reserve a Cake
+        </a>
+      </div>
+    </div>
+
+  <% } else { %>
+
+    <div class="reservation-card card d-none d-md-block">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4 py-3">Cake</th>
+                <th class="py-3">Pickup Date</th>
+                <th class="py-3">Pickup Time</th>
+                <th class="py-3">Message</th>
+                <th class="py-3">Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% reservations.forEach((reservation) => { %>
+              <tr>
+                <td class="ps-4 fw-semibold text-pink">
+                  <%= reservation.cake_name %>
+                </td>
+
+                <td>
+                  <%= new Date(reservation.pickup_date).toLocaleDateString('en-PH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  }) %>
+                </td>
+
+                <td>
+                  <%= reservation.pickup_time %>
+                </td>
+
+                <td>
+                  <%= reservation.message_on_cake || '-' %>
+                </td>
+
+                <td>
+                  <% if (reservation.status === 'Pending') { %>
+                    <span class="badge bg-warning text-dark">
+                      Pending
+                    </span>
+                  <% } else if (reservation.status === 'Approved') { %>
+                    <span class="badge bg-success">
+                      Approved
+                    </span>
+                  <% } else if (reservation.status === 'Rejected') { %>
+                    <span class="badge bg-danger">
+                      Rejected
+                    </span>
+                  <% } else if (reservation.status === 'Ready') { %>
+                    <span class="badge bg-primary">
+                      Ready
+                    </span>
+                  <% } else { %>
+                    <span class="badge bg-secondary">
+                      <%= reservation.status %>
+                    </span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-md-none">
+      <% reservations.forEach((reservation) => { %>
+      <div class="mobile-reservation-card">
+
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="fw-bold text-pink">
+              <%= reservation.cake_name %>
+            </div>
+
+            <small class="text-muted">
+              <%= new Date(reservation.pickup_date).toLocaleDateString('en-PH', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              }) %>
+              at
+              <%= reservation.pickup_time %>
+            </small>
+          </div>
+
+          <% if (reservation.status === 'Pending') { %>
+            <span class="badge bg-warning text-dark">
+              Pending
+            </span>
+          <% } else if (reservation.status === 'Approved') { %>
+            <span class="badge bg-success">
+              Approved
+            </span>
+          <% } else if (reservation.status === 'Rejected') { %>
+            <span class="badge bg-danger">
+              Rejected
+            </span>
+          <% } else if (reservation.status === 'Ready') { %>
+            <span class="badge bg-primary">
+              Ready
+            </span>
+          <% } else { %>
+            <span class="badge bg-secondary">
+              <%= reservation.status %>
+            </span>
+          <% } %>
+        </div>
+
+        <div class="small text-muted">
+          <strong>Message:</strong>
+          <%= reservation.message_on_cake || '-' %>
+        </div>
+
+        <div class="small text-muted">
+          <strong>Instructions:</strong>
+          <%= reservation.instructions || '-' %>
+        </div>
+
+      </div>
+      <% }) %>
+    </div>
+
+  <% } %>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

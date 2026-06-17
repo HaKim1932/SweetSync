@@ -125,6 +125,11 @@ exports.updateProduct = (req, res) => {
         category
     } = req.body;
 
+    const image =
+        req.file
+            ? "images/" + req.file.filename
+            : null;
+
     Product.updateProduct(
         id,
         name,
@@ -132,6 +137,7 @@ exports.updateProduct = (req, res) => {
         price,
         stock,
         category,
+        image,
         (err) => {
             if (err) {
                 return res.status(500).send(err);
