@@ -108,10 +108,12 @@ exports.totalRevenue = (callback) => {
         SELECT
             IFNULL(SUM(total), 0) AS revenue
         FROM orders
+        WHERE status = 'Completed'
         `,
         callback
     );
 };
+
 exports.getOrderItems = (
     orderId,
     callback
@@ -130,5 +132,85 @@ exports.getOrderItems = (
         sql,
         [orderId],
         callback
+    );
+};
+
+exports.getSalesReport = (
+    callback
+) => {
+
+    const sql = `
+        SELECT
+            COUNT(*) AS totalOrders,
+
+            SUM(
+                CASE
+                    WHEN status = 'Pending'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS pendingOrders,
+
+            SUM(
+                CASE
+                    WHEN status = 'Completed'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS completedOrders,
+
+            IFNULL(
+    SUM(
+        CASE
+            WHEN status = 'Completed'
+            THEN total
+            ELSE 0
+        END
+    ),
+    0
+) AS totalRevenue
+
+        FROM orders
+    `;
+
+    db.query(
+        sql,
+        callback
+    );
+
+};
+exports.getTopSellingProducts = (callback) => {
+    const sql = `
+        SELECT
+            p.id,
+            p.name,
+            p.category,
+            p.price,
+            SUM(oi.quantity) AS total_quantity,
+            SUM(oi.quantity * oi.price) AS total_revenue
+        FROM order_items oi
+        JOIN products p
+            ON p.id = oi.product_id
+        GROUP BY
+            p.id,
+            p.name,
+            p.category,
+            p.price
+        ORDER BY total_quantity DESC
+        LIMIT 5
+    `;
+
+    db.query(
+        sql,
+        (err, results) => {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(
+                null,
+                results
+            );
+        }
     );
 };

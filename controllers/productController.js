@@ -47,29 +47,46 @@ exports.showAddProduct = (req, res) => {
 
 // ADD PRODUCT
 exports.addProduct = (req, res) => {
-    const {
-        name,
-        description,
-        price,
-        stock,
-        category
-    } = req.body;
 
-    Product.createProduct(
-        name,
-        description,
-        price,
-        stock,
-        category,
-        (err) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
 
-            res.redirect("/products");
+const {
+    name,
+    description,
+    price,
+    stock,
+    category
+} = req.body;
+
+const image =
+    req.file
+        ? "images/" + req.file.filename
+        : null;
+
+Product.createProduct(
+    name,
+    description,
+    price,
+    stock,
+    category,
+    image,
+    (err) => {
+
+        if (err) {
+            return res
+                .status(500)
+                .send(err);
         }
-    );
+
+        res.redirect(
+            "/products"
+        );
+
+    }
+);
+
+
 };
+
 
 // SHOW EDIT FORM
 exports.showEditProduct = (req, res) => {

@@ -7,9 +7,18 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
 </head>
 
-<body class="container mt-5">
+<body>
+
+<%- include('partials/navbar') %>
+
+<div class="container mt-5">
 
     <h1 class="mb-3">
         Admin Dashboard
@@ -19,12 +28,17 @@
         Welcome <%= user.fullname %>
     </p>
 
+    <!-- Summary Cards -->
     <div class="row mt-4">
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-primary">
                 <div class="card-body">
-                    <h5>Total Products</h5>
+                    <h5>
+                        <i class="bi bi-box-seam"></i>
+                        Total Products
+                    </h5>
+
                     <h2>
                         <%= totalProducts %>
                     </h2>
@@ -32,10 +46,14 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h5>Total Orders</h5>
+                    <h5>
+                        <i class="bi bi-bag-check"></i>
+                        Total Orders
+                    </h5>
+
                     <h2>
                         <%= totalOrders %>
                     </h2>
@@ -43,12 +61,16 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-warning">
                 <div class="card-body">
-                    <h5>Revenue</h5>
+                    <h5>
+                        <i class="bi bi-cash-stack"></i>
+                        Revenue
+                    </h5>
+
                     <h2>
-                        ₱<%= revenue %>
+                        ₱<%= report.totalRevenue || 0 %>
                     </h2>
                 </div>
             </div>
@@ -56,7 +78,192 @@
 
     </div>
 
-    <div class="mt-4">
+    <!-- Sales Report -->
+    <div class="card shadow-sm mt-4">
+
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-graph-up-arrow"></i>
+                Sales Report
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <h6>Total Orders</h6>
+
+                        <h3>
+                            <%= report.totalOrders || 0 %>
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <h6>Pending Orders</h6>
+
+                        <h3 class="text-warning">
+                            <%= report.pendingOrders || 0 %>
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <h6>Completed Orders</h6>
+
+                        <h3 class="text-success">
+                            <%= report.completedOrders || 0 %>
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <h6>Total Revenue</h6>
+
+                        <h3 class="text-primary">
+                            ₱<%= report.totalRevenue || 0 %>
+                        </h3>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Top Selling Products -->
+    <div class="card shadow-sm mt-4">
+
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-trophy"></i>
+                Top Selling Products
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <% if (topProducts.length === 0) { %>
+
+                <div class="text-center py-4">
+                    <i
+                        class="bi bi-bar-chart-line"
+                        style="font-size: 3rem; color: #dee2e6;"
+                    ></i>
+
+                    <p class="text-muted mt-3 mb-0">
+                        No sales data available yet.
+                    </p>
+                </div>
+
+            <% } else { %>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th class="text-center">
+                                    Units Sold
+                                </th>
+                                <th class="text-end">
+                                    Total Revenue
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <% topProducts.forEach((product, index) => { %>
+
+                            <tr>
+
+                                <td>
+                                    <% if (index === 0) { %>
+
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-trophy-fill me-1"></i>
+                                            1st
+                                        </span>
+
+                                    <% } else if (index === 1) { %>
+
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-trophy me-1"></i>
+                                            2nd
+                                        </span>
+
+                                    <% } else if (index === 2) { %>
+
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-trophy me-1"></i>
+                                            3rd
+                                        </span>
+
+                                    <% } else { %>
+
+                                        <span class="text-muted fw-semibold">
+                                            <%= index + 1 %>th
+                                        </span>
+
+                                    <% } %>
+                                </td>
+
+                                <td class="fw-semibold">
+                                    <%= product.name %>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <%= product.category || 'N/A' %>
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+
+                                    <span class="fw-bold text-success">
+                                        <%= product.total_quantity %>
+                                    </span>
+
+                                    <small class="text-muted d-block">
+                                        units
+                                    </small>
+
+                                </td>
+
+                                <td class="text-end fw-bold">
+                                    ₱<%= parseFloat(product.total_revenue).toFixed(2) %>
+                                </td>
+
+                            </tr>
+
+                            <% }) %>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            <% } %>
+
+        </div>
+
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="mt-4 mb-5">
 
         <a
             href="/products"
@@ -80,6 +287,8 @@
         </a>
 
     </div>
+
+</div>
 
 </body>
 </html>

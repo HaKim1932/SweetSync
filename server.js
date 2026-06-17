@@ -7,6 +7,7 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 
+
 require("./config/db");
 
 const userRoutes = require("./routes/users");
@@ -41,6 +42,11 @@ app.use(
         saveUninitialized: false
     })
 );
+// Make session user available in every EJS view
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    next();
+});
 
 app.use("/api/users", userRoutes);
 app.use("/auth", authRoutes);

@@ -2,48 +2,51 @@ const express = require("express");
 const router = express.Router();
 
 const productController =
-    require("../controllers/productController");
+require("../controllers/productController");
 
-// LIST PRODUCTS
+const upload =
+require("../middleware/upload");
+
 const {
-    requireAuth
+requireAuth
 } = require("../middleware/auth");
 
+// LIST PRODUCTS
 router.get(
-    "/",
-    requireAuth,
-    productController.listProducts
+"/",
+requireAuth,
+productController.listProducts
 );
-
 
 // ADD PRODUCT FORM
 router.get(
-    "/add",
-    productController.showAddProduct
+"/add",
+productController.showAddProduct
 );
 
 // SAVE PRODUCT
 router.post(
-    "/add",
-    productController.addProduct
+"/add",
+upload.single("image"),
+productController.addProduct
 );
 
 // EDIT FORM
 router.get(
-    "/edit/:id",
-    productController.showEditProduct
+"/edit/:id",
+productController.showEditProduct
 );
 
 // UPDATE PRODUCT
 router.post(
-    "/edit/:id",
-    productController.updateProduct
+"/edit/:id",
+productController.updateProduct
 );
 
 // DELETE PRODUCT
 router.get(
-    "/delete/:id",
-    productController.deleteProduct
+"/delete/:id",
+productController.deleteProduct
 );
 
 module.exports = router;
