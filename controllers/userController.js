@@ -21,9 +21,7 @@ exports.register = async (req, res) => {
                     });
                 }
 
-                res.json({
-                    message: "User registered successfully"
-                });
+                res.redirect("/auth/login");
             }
         );
     } catch (error) {

@@ -214,3 +214,30 @@ exports.getTopSellingProducts = (callback) => {
         }
     );
 };
+exports.updatePaymentProof = (
+    orderId,
+    paymentProof,
+    callback
+) => {
+    const sql = `
+        UPDATE orders
+        SET payment_proof = ?
+        WHERE id = ?
+    `;
+
+    db.query(
+        sql,
+        [
+            paymentProof,
+            orderId
+        ],
+        callback
+    );
+};
+exports.getOrderById = (orderId, callback) => {
+    db.query(
+        "SELECT * FROM orders WHERE id = ?",
+        [orderId],
+        callback
+    );
+};

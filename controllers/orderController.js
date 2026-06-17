@@ -199,26 +199,59 @@ exports.updateStatus = (
 };
 
 // ORDER DETAILS
-exports.orderDetails = (
+exports.orderDetails = (req, res) => {
+    const orderId = req.params.id;
+
+    Order.getOrderById(orderId, (err, orderResults) => {
+        if (err) {
+            return res.send(err);
+        }
+
+        if (orderResults.length === 0) {
+            return res.send("Order not found");
+        }
+
+        Order.getOrderItems(orderId, (err, items) => {
+            if (err) {
+                return res.send(err);
+            }
+
+            res.render("order-details", {
+                order: orderResults[0],
+                orderId,
+                items
+            });
+        });
+    });
+};
+
+// UPLOAD PAYMENT PROOF
+exports.uploadPaymentProof = (
     req,
     res
 ) => {
     const orderId =
         req.params.id;
 
-    Order.getOrderItems(
+    if (!req.file) {
+        return res.send(
+            "Please upload a payment proof image."
+        );
+    }
+
+    const paymentProof =
+        "images/" + req.file.filename;
+
+    Order.updatePaymentProof(
         orderId,
-        (err, items) => {
+        paymentProof,
+        (err) => {
             if (err) {
                 return res.send(err);
             }
 
-            res.render(
-                "order-details",
-                {
-                    orderId,
-                    items
-                }
+            res.redirect(
+                "/orders/" + orderId
             );
         }
     );

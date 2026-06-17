@@ -116,7 +116,7 @@
 
                   <!-- Total -->
                   <td class="fw-semibold">
-                    &#8369;<%= parseFloat(order.total).toFixed(2) %>
+                    ₱<%= parseFloat(order.total).toFixed(2) %>
                   </td>
 
                   <!-- Status Badge -->
@@ -200,7 +200,7 @@
                       align-items-center">
             <div>
               <div class="fw-semibold">
-                &#8369;<%= parseFloat(order.total).toFixed(2) %>
+                ₱<%= parseFloat(order.total).toFixed(2) %>
               </div>
               <small class="text-muted">
                 <%= new Date(order.created_at)
