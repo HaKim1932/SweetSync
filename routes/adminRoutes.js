@@ -1,3 +1,6 @@
+const reservationController =
+    require("../controllers/reservationController");
+
 const adminController =
     require("../controllers/adminController");
 const express = require("express");
@@ -30,4 +33,20 @@ router.post(
     requireAdmin,
     orderController.updateStatus
 );
+// ADMIN VIEW RESERVATIONS
+router.get(
+    "/reservations",
+    requireAuth,
+    requireAdmin,
+    reservationController.adminReservations
+);
+
+// ADMIN UPDATE RESERVATION STATUS
+router.post(
+    "/reservations/:id/status",
+    requireAuth,
+    requireAdmin,
+    reservationController.updateStatus
+);
+
 module.exports = router;
