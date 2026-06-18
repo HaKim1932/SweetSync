@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 
@@ -70,14 +71,30 @@ exports.login = async (req, res) => {
             });
         }
 
-        req.session.user = {
-            id: user.id,
-            fullname: user.fullname,
-            email: user.email,
-            role: user.role
-        };
+        const authToken =
+            crypto.randomBytes(32).toString("hex");
 
-        res.redirect("/dashboard");
+        User.updateAuthToken(
+            user.id,
+            authToken,
+            (err) => {
+                if (err) {
+                    return res.status(500).json({
+                        message: "Token generation failed"
+                    });
+                }
+
+                req.session.user = {
+                    id: user.id,
+                    fullname: user.fullname,
+                    email: user.email,
+                    role: user.role,
+                    auth_token: authToken
+                };
+
+                res.redirect("/dashboard");
+            }
+        );
     });
 };
 
@@ -94,9 +111,23 @@ exports.profile = (req, res) => {
 
 // LOGOUT
 exports.logout = (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/auth/login");
-    });
+    const userId =
+        req.session.user
+            ? req.session.user.id
+            : null;
+
+    if (!userId) {
+        return res.redirect("/auth/login");
+    }
+
+    User.clearAuthToken(
+        userId,
+        () => {
+            req.session.destroy(() => {
+                res.redirect("/auth/login");
+            });
+        }
+    );
 };
 
 // ADMIN - LIST USERS

@@ -103,4 +103,51 @@ module.exports = {
     getAllUsers,
     updateUserRole,
     updateUserStatus
+    
+};
+const updateAuthToken = (
+    userId,
+    token,
+    callback
+) => {
+    const sql = `
+        UPDATE users
+        SET auth_token = ?
+        WHERE id = ?
+    `;
+
+    db.query(
+        sql,
+        [
+            token,
+            userId
+        ],
+        callback
+    );
+};
+
+const clearAuthToken = (
+    userId,
+    callback
+) => {
+    const sql = `
+        UPDATE users
+        SET auth_token = NULL
+        WHERE id = ?
+    `;
+
+    db.query(
+        sql,
+        [userId],
+        callback
+    );
+};
+module.exports = {
+    findByEmail,
+    createUser,
+    getAllUsers,
+    updateUserRole,
+    updateUserStatus,
+    updateAuthToken,
+    clearAuthToken
 };
