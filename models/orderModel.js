@@ -241,3 +241,45 @@ exports.getOrderById = (orderId, callback) => {
         callback
     );
 };
+exports.getMonthlyRevenue = (callback) => {
+    const sql = `
+        SELECT
+            DATE_FORMAT(created_at, '%b') AS month,
+            IFNULL(SUM(total), 0) AS revenue
+        FROM orders
+        WHERE status = 'Completed'
+        GROUP BY MONTH(created_at), DATE_FORMAT(created_at, '%b')
+        ORDER BY MONTH(created_at)
+    `;
+
+    db.query(sql, callback);
+};
+
+exports.getMonthlyOrders = (callback) => {
+    const sql = `
+        SELECT
+            DATE_FORMAT(created_at, '%b') AS month,
+            COUNT(*) AS order_count
+        FROM orders
+        GROUP BY MONTH(created_at), DATE_FORMAT(created_at, '%b')
+        ORDER BY MONTH(created_at)
+    `;
+
+    db.query(sql, callback);
+};
+
+exports.getProductSalesPie = (callback) => {
+    const sql = `
+        SELECT
+            products.name,
+            SUM(order_items.quantity) AS total_sold
+        FROM order_items
+        JOIN products
+        ON order_items.product_id = products.id
+        GROUP BY products.id, products.name
+        ORDER BY total_sold DESC
+        LIMIT 5
+    `;
+
+    db.query(sql, callback);
+};

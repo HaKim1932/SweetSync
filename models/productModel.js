@@ -250,3 +250,20 @@ db.query(
 
 
 };
+
+// LOW STOCK PRODUCTS
+exports.getLowStockProducts = (
+    callback
+) => {
+
+    db.query(
+        `
+        SELECT *
+        FROM products
+        WHERE stock <= 5
+        ORDER BY stock ASC
+        `,
+        callback
+    );
+
+};

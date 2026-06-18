@@ -6,13 +6,14 @@ exports.register = async (req, res) => {
     try {
         const { fullname, email, password } = req.body;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
 
         User.createUser(
             fullname,
             email,
             hashedPassword,
-            (err, result) => {
+            (err) => {
                 if (err) {
                     console.log(err);
 
@@ -52,6 +53,12 @@ exports.login = async (req, res) => {
 
         const user = results[0];
 
+        if (user.is_active === 0) {
+            return res.status(403).json({
+                message: "Your account has been deactivated."
+            });
+        }
+
         const isMatch = await bcrypt.compare(
             password,
             user.password
@@ -63,7 +70,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        // SAVE SESSION
         req.session.user = {
             id: user.id,
             fullname: user.fullname,
@@ -91,4 +97,53 @@ exports.logout = (req, res) => {
     req.session.destroy(() => {
         res.redirect("/auth/login");
     });
+};
+
+// ADMIN - LIST USERS
+exports.adminUsers = (req, res) => {
+    User.getAllUsers((err, users) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        res.render("admin-users", {
+            users
+        });
+    });
+};
+
+// ADMIN - UPDATE USER ROLE
+exports.updateUserRole = (req, res) => {
+    const userId = req.params.id;
+    const role = req.body.role;
+
+    User.updateUserRole(
+        userId,
+        role,
+        (err) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.redirect("/admin/users");
+        }
+    );
+};
+
+// ADMIN - ACTIVATE / DEACTIVATE USER
+exports.updateUserStatus = (req, res) => {
+    const userId = req.params.id;
+    const isActive = req.body.is_active;
+
+    User.updateUserStatus(
+        userId,
+        isActive,
+        (err) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.redirect("/admin/users");
+        }
+    );
 };
