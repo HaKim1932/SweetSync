@@ -267,3 +267,25 @@ exports.getLowStockProducts = (
     );
 
 };
+exports.getSearchSuggestions = (
+    keyword,
+    callback
+) => {
+    const sql = `
+        SELECT
+            id,
+            name
+        FROM products
+        WHERE name LIKE ?
+        ORDER BY name ASC
+        LIMIT 8
+    `;
+
+    db.query(
+        sql,
+        [
+            "%" + keyword + "%"
+        ],
+        callback
+    );
+};

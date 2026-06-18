@@ -163,3 +163,23 @@ exports.deleteProduct = (req, res) => {
         }
     );
 };
+// AJAX SEARCH SUGGESTIONS
+exports.searchSuggestions = (req, res) => {
+    const keyword =
+        req.query.keyword || "";
+
+    if (keyword.trim() === "") {
+        return res.json([]);
+    }
+
+    Product.getSearchSuggestions(
+        keyword,
+        (err, results) => {
+            if (err) {
+                return res.status(500).json([]);
+            }
+
+            res.json(results);
+        }
+    );
+};

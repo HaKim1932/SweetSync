@@ -20,6 +20,7 @@ productController.listProducts
 
 // ADD PRODUCT FORM
 router.get(
+    
 "/add",
 productController.showAddProduct
 );
@@ -48,6 +49,11 @@ router.post(
 router.get(
 "/delete/:id",
 productController.deleteProduct
+);
+
+router.get(
+    "/suggestions",
+    productController.searchSuggestions
 );
 
 module.exports = router;
