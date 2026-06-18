@@ -2,42 +2,88 @@ const Product = require("../models/productModel");
 
 // LIST PRODUCTS
 exports.listProducts = (req, res) => {
-  const search = req.query.search || '';
-  const category = req.query.category || '';
+    const search = req.query.search || "";
+    const category = req.query.category || "";
 
-  // Get distinct categories for the filter buttons
-  Product.getAllProducts((err, allProducts) => {
-    if (err) {
-      console.error('listProducts - getAllProducts error:', err);
-      return res.status(500).send(err);
-    }
+    const page =
+        parseInt(req.query.page) || 1;
 
-    // Extract unique categories from all products
-    const categories = [];
-    allProducts.forEach((product) => {
-      if (
-        product.category &&
-        categories.indexOf(product.category) === -1
-      ) {
-        categories.push(product.category);
-      }
+    const limit = 6;
+
+    const offset =
+        (page - 1) * limit;
+
+    Product.getAllProducts((err, allProducts) => {
+        if (err) {
+            console.error(
+                "listProducts - getAllProducts error:",
+                err
+            );
+
+            return res.status(500).send(err);
+        }
+
+        const categories = [];
+
+        allProducts.forEach((product) => {
+            if (
+                product.category &&
+                categories.indexOf(product.category) === -1
+            ) {
+                categories.push(product.category);
+            }
+        });
+
+        Product.countFilteredProducts(
+            search,
+            category,
+            (err, countResults) => {
+                if (err) {
+                    console.error(
+                        "listProducts - countFilteredProducts error:",
+                        err
+                    );
+
+                    return res.status(500).send(err);
+                }
+
+                const totalProducts =
+                    countResults[0].total;
+
+                const totalPages =
+                    Math.ceil(totalProducts / limit);
+
+                Product.searchProductsPaginated(
+                    search,
+                    category,
+                    limit,
+                    offset,
+                    (err, results) => {
+                        if (err) {
+                            console.error(
+                                "listProducts - searchProductsPaginated error:",
+                                err
+                            );
+
+                            return res.status(500).send(err);
+                        }
+
+                        res.render(
+                            "products/list-products",
+                            {
+                                products: results,
+                                categories: categories,
+                                currentSearch: search,
+                                currentCategory: category,
+                                currentPage: page,
+                                totalPages: totalPages
+                            }
+                        );
+                    }
+                );
+            }
+        );
     });
-
-    // Now run search/filter query
-    Product.searchProducts(search, category, (err, results) => {
-      if (err) {
-        console.error('listProducts - searchProducts error:', err);
-        return res.status(500).send(err);
-      }
-
-      res.render('products/list-products', {
-        products: results,
-        categories: categories,
-        currentSearch: search,
-        currentCategory: category
-      });
-    });
-  });
 };
 
 // SHOW ADD FORM

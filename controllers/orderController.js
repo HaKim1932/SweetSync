@@ -1,6 +1,7 @@
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
+const EmailService = require("../utils/emailService");
 
 // CHECKOUT
 exports.checkout = (req, res) => {
@@ -191,8 +192,43 @@ exports.updateStatus = (
                 return res.send(err);
             }
 
-            res.redirect(
-                "/admin/orders"
+            Order.getOrderWithUser(
+                orderId,
+                async (
+                    err2,
+                    results
+                ) => {
+                    if (err2) {
+                        return res.send(err2);
+                    }
+
+                    if (results.length === 0) {
+                        return res.redirect(
+                            "/admin/orders"
+                        );
+                    }
+
+                    const order =
+                        results[0];
+
+                    try {
+                        await EmailService.sendOrderStatusEmail(
+                            order.email,
+                            order.fullname,
+                            order.id,
+                            status
+                        );
+                    } catch (emailError) {
+                        console.log(
+                            "Email send failed:",
+                            emailError
+                        );
+                    }
+
+                    res.redirect(
+                        "/admin/orders"
+                    );
+                }
             );
         }
     );

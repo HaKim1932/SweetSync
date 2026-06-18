@@ -289,3 +289,49 @@ exports.getSearchSuggestions = (
         callback
     );
 };
+exports.searchProductsPaginated = (
+    search,
+    category,
+    limit,
+    offset,
+    callback
+) => {
+    let sql = "SELECT * FROM products WHERE 1=1";
+    const params = [];
+
+    if (search && search.trim() !== "") {
+        sql += " AND name LIKE ?";
+        params.push("%" + search.trim() + "%");
+    }
+
+    if (category && category.trim() !== "") {
+        sql += " AND category = ?";
+        params.push(category.trim());
+    }
+
+    sql += " ORDER BY name ASC LIMIT ? OFFSET ?";
+    params.push(limit, offset);
+
+    db.query(sql, params, callback);
+};
+
+exports.countFilteredProducts = (
+    search,
+    category,
+    callback
+) => {
+    let sql = "SELECT COUNT(*) AS total FROM products WHERE 1=1";
+    const params = [];
+
+    if (search && search.trim() !== "") {
+        sql += " AND name LIKE ?";
+        params.push("%" + search.trim() + "%");
+    }
+
+    if (category && category.trim() !== "") {
+        sql += " AND category = ?";
+        params.push(category.trim());
+    }
+
+    db.query(sql, params, callback);
+};

@@ -283,3 +283,21 @@ exports.getProductSalesPie = (callback) => {
 
     db.query(sql, callback);
 };
+exports.getOrderWithUser = (orderId, callback) => {
+    const sql = `
+        SELECT
+            orders.*,
+            users.fullname,
+            users.email
+        FROM orders
+        JOIN users
+        ON orders.user_id = users.id
+        WHERE orders.id = ?
+    `;
+
+    db.query(
+        sql,
+        [orderId],
+        callback
+    );
+};
